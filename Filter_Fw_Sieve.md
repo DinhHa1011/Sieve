@@ -1,7 +1,7 @@
 ```
 require [ "imap4flags","fileinto","mailbox","copy",...];
 ```
-## Một vài cấu sieve thông dụng
+## Một vài config sieve thông dụng
 ### Subject chứa "hi" => đánh dấu sao
 ```
 if allof (header :contains "Subject" "hi")
