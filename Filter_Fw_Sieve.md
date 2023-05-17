@@ -60,3 +60,9 @@ if allof (size :over 1M)
 if allof (size :under 4M)
 {discard;}
 ```
+#### 11. Gửi từ niemdt@gmail.com và header không chứa "hi" => fw sang test2@anthanh264.site
+```
+require ["copy"]
+if allof (header :contains "from" "niemdt@gmail.com", not header :contains "subject" "hi")
+{redirect :copy "test2@anthanh264.site";}
+```
