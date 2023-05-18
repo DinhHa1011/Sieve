@@ -1,0 +1,1 @@
+- `editheader` extension RFC 5293 cho phép Sieve script xóa và thêm fields message header, do đó cho phép tương tước với các thành phần khác sử dụng hoặc tạo ra các deader fields
