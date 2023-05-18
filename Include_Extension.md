@@ -1,0 +1,2 @@
+- Sieve `include` extension RFC 6609 cho phép người dùng đưa một Sieve script vào một script khác
+- Điều này có thể làm cho việc quản lý các script lớn hoặc nhiều script trở nên dễ dàng hơn nhiều và cho phép một trang wweb
