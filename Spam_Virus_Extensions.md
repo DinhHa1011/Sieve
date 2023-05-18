@@ -1,0 +1,1 @@
+- Sử dụng spamtest và virustest extensions RFC 5235, ngôn ngữ Sieve cung cấp một giao diện lệnh thống nhất và được tiêu chuẩn hóa để đánh giá các bài kiểm t
