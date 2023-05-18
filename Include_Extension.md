@@ -6,6 +6,7 @@
 - `include` extension có sẵn theo mặc định
 - `include` extension có các cài đặt cụ thể của riêng nó
 - Các cài đặt sau có thể được định cấu hình cho `include` extension (các giá trị mặc định được chỉ định):
+
 `sieve_include_max_includes = 255`
   - Số tối đa script có thể bao gồm
   - Đây là tổng số script tối đa trong include tree
