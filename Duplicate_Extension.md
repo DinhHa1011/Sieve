@@ -21,3 +21,18 @@
       sieve_duplicate_max_period = 1d
     }
     ```
+### My Config
+- Sửa file (thêm user_query) vim /etc/dovecot/dovecot-sql.conf.ext
+```
+user_query = SELECT CONCAT('/var/mail','/','%d','/','%n') as home, 'vmail' as uid, 'vmail'as gid,CONCAT('/var/mail','/','%d','/','%n') as mail FROM virtual_Users WHERE email= '%u';
+```
+- vim /etc/dovecot/sieve/before.sieve
+```
+require ["duplicate","fileinto","mailbox"];
+if allof (duplicate :header "Subject")
+{fileinto :create "INBOX.AHa";}
+```
+```
+sievec /etc/dovecot/sieve/before.sieve
+systemctl restart dovecot
+```
