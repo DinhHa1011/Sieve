@@ -1,0 +1,3 @@
+- Phần mở rộng duplicate RFC 7352 thêm một lệnh test mới được gọi là `duplicate` vào ngôn ngữ Sieve
+- Test này thêm khả năng phát hiện duplications
+- Ứng dụng chính cho test mới này là xử lý việc gửi duplicate thường do đăng ký danh sách gửi mail hoặc địa chỉ mail được chuyển hướng
