@@ -50,12 +50,24 @@ if header :matches "from" "*@*.examole.org" {
 ### My Config
 - vim /etc/dovecot/sieve/before.sieve
 ```
-require ["enotify", "fileinto", "variables"];
-if header :contains "from" "ah@dinhha.online" {
+require ["enotify", "fileinto","mailbox", "variables"];
+# Nếu header gửi từ hadt@bizflycloud.vn thì email sẽ gửi sang ah@dinhha.online với Priority là Highest
+if header :contains "from" "hadt@bizflycloud.vn" {
  notify :importance "1"
   :message "This is probably very important"
-   "mailto:hadt@bizflycloud.vn";
+   "mailto:ah@dinhha.online";
  stop;
 }
+if header :contains "to" "ha@dinhha.online" {
+ if header :matches "Subject" "*" {
+  set "subject" "${1}";
+ }
+ if header :matches "From" "*" {
+  set "from" "${1}";
+ }
+ notify :importance "3"
+  :message "[SIEVE] ${from}: ${subject}"
+  "mailto:ah@dinhha.online";
+ fileinto :create "INBOX.Sieve";
+}
 ```
-- Nếu header gửi từ ah@dinhha.online thì email sẽ gửi sang hadt@bizflycloud.vn với Priority là Highest
