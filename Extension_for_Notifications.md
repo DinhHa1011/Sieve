@@ -49,25 +49,48 @@ if header :matches "from" "*@*.examole.org" {
 ```
 ### My Config
 - vim /etc/dovecot/sieve/before.sieve
-```
-require ["enotify", "fileinto","mailbox", "variables"];
-# Nếu header gửi từ hadt@bizflycloud.vn thì email sẽ gửi sang ah@dinhha.online với Priority là Highest
-if header :contains "from" "hadt@bizflycloud.vn" {
- notify :importance "1"
-  :message "This is probably very important"
-   "mailto:ah@dinhha.online";
- stop;
+
+```# Require
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate"];
+
+# Send notifications with different importance levels
+if header :contains "from" "ah@dinhha.online" { # nếu header có from là ah@dinhha.online
+ notify :importance "1" # Set thông báo quan trọng = 1 => Cao nhất
+  :message "This is probably very important" # Nội dung thông báo: Cái mail này quan trọng vc
+   "mailto:test1@anthanh264.site"; # Gửi tới test1@anthanh264.site
+ stop; # Dừng 
 }
-if header :contains "to" "ha@dinhha.online" {
- if header :matches "Subject" "*" {
-  set "subject" "${1}";
+if header :contains "to" "test2@anthanh264.site" { # Nếu header có to là test2@anthanh264.site
+ if header :matches "Subject" "*" { # Matches để lấy subject của mail 
+  set "subject" "${1}"; # Hiểu câu này kiểu lưu cái subject vừa lấy vào biến subject 
  }
- if header :matches "From" "*" {
-  set "from" "${1}";
+ if header :matches "From" "*" { # Matches để lấy From của mail 
+  set "from" "${1}"; # Hiểu câu này kiểu lưu cái from vừa lấy vào biến from 
  }
- notify :importance "3"
-  :message "[SIEVE] ${from}: ${subject}"
-  "mailto:ah@dinhha.online";
- fileinto :create "INBOX.Sieve";
+ notify :importance "3"  # Set thông báo quan trọng = 3 => Thấp nhất
+  :message "[SIEVE] ${from}: ${subject}" # Nội dung thông báo: [SIEVE] biến from : biến subject 
+  "mailto:test1@anthanh264.site"; # Gửi tới test1@anthanh264.site
+ fileinto :create "INBOX.sieve"; # Cho vào mailbox sieve của test2@anthanh264.site 
+}
+
+# Send notification if we receive mail from domain
+if header :matches "from" "*@*dinhha.online" { # nếu mà header có đuôi sau @ là dinhha.online thì lấy hết phần from 
+    # :matches is used to get the MAIL FROM address
+    if envelope :all :matches "from" "*" {
+        set "env_from" " [really: ${1}]"; #set biến envfrom = really: from vừa lấy 
+    }
+
+    # :matches is used to get the value of the Subject header
+    if header :matches "Subject" "*" {
+        set "subject" "${1}"; #set biến subject = subject vừa lấy
+    }
+
+    # :matches is used to get the address from the From header
+    if address :matches :all "from" "*" {
+        set "from_addr" "${1}";
+    }
+
+    notify :message "${from_addr}${env_from}: ${subject}"
+                    "mailto:test1@anthanh264.site";
 }
 ```
