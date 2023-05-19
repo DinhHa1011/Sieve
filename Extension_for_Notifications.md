@@ -47,3 +47,15 @@ if header :matches "from" "*@*.examole.org" {
   notify :message "${from_addr}$(env_from): ${subject}" "mailto:alm@example.com";
 }
 ```
+### My Config
+- vim /etc/dovecot/sieve/before.sieve
+```
+require ["enotify", "fileinto", "variables"];
+if header :contains "from" "ah@dinhha.online" {
+ notify :importance "1"
+  :message "This is probably very important"
+   "mailto:hadt@bizflycloud.vn";
+ stop;
+}
+```
+- Nếu header gửi từ ah@dinhha.online thì email sẽ gửi sang hadt@bizflycloud.vn với Priority là Highest
