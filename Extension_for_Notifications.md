@@ -94,3 +94,32 @@ if header :matches "from" "*@*dinhha.online" { # nếu mà header có đuôi sau
                     "mailto:test1@anthanh264.site";
 }
 ```
+#### 1. Set mail quan trọng nhất
+- Gửi từ hadt@bizflycloud.vn tới domain dinhha.online=> set thông báo quan trọng nhất, auto fw quan trọng sang ha@dinhha.online
+```
+require ["enotify","imap4flags", "fileinto","mailbox", "variables"];
+#if header :contains "from" "hadt@bizflycloud.vn" {
+# notify :importance "1"
+#  :message "This is probably very important"
+#   "mailto:ha@dinhha.online";
+# stop;
+#}
+```
+#### 2. Set thứ tự quan trọng
+- Gửi tới ah@dinhha.online => ah@dinhha.online set flags, ha@dinhha.online nhận một message theo định dạng
+```
+require ["enotify","imap4flags", "fileinto","mailbox", "variables"];
+if header :contains "to" "ah@dinhha.online" {
+ if header :matches "Subject" "*" {
+  set "subject" "${1}";
+ }
+ if header :matches "From" "*" {
+  set "from" "${1}";
+ }
+ notify :importance "3"
+  :message "[SIEVE] ${from}: ${subject}"
+  "mailto:ha@dinhha.online";
+ setflag ["\\Flagged"];
+}
+```
+
