@@ -48,51 +48,8 @@ if header :matches "from" "*@*.examole.org" {
 }
 ```
 ### My Config
-- vim /etc/dovecot/sieve/before.sieve
-
-```# Require
-require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate"];
-
-# Send notifications with different importance levels
-if header :contains "from" "ah@dinhha.online" { # nếu header có from là ah@dinhha.online
- notify :importance "1" # Set thông báo quan trọng = 1 => Cao nhất
-  :message "This is probably very important" # Nội dung thông báo: Cái mail này quan trọng vc
-   "mailto:test1@anthanh264.site"; # Gửi tới test1@anthanh264.site
- stop; # Dừng 
-}
-if header :contains "to" "test2@anthanh264.site" { # Nếu header có to là test2@anthanh264.site
- if header :matches "Subject" "*" { # Matches để lấy subject của mail 
-  set "subject" "${1}"; # Hiểu câu này kiểu lưu cái subject vừa lấy vào biến subject 
- }
- if header :matches "From" "*" { # Matches để lấy From của mail 
-  set "from" "${1}"; # Hiểu câu này kiểu lưu cái from vừa lấy vào biến from 
- }
- notify :importance "3"  # Set thông báo quan trọng = 3 => Thấp nhất
-  :message "[SIEVE] ${from}: ${subject}" # Nội dung thông báo: [SIEVE] biến from : biến subject 
-  "mailto:test1@anthanh264.site"; # Gửi tới test1@anthanh264.site
- fileinto :create "INBOX.sieve"; # Cho vào mailbox sieve của test2@anthanh264.site 
-}
-
-# Send notification if we receive mail from domain
-if header :matches "from" "*@*dinhha.online" { # nếu mà header có đuôi sau @ là dinhha.online thì lấy hết phần from 
-    # :matches is used to get the MAIL FROM address
-    if envelope :all :matches "from" "*" {
-        set "env_from" " [really: ${1}]"; #set biến envfrom = really: from vừa lấy 
-    }
-
-    # :matches is used to get the value of the Subject header
-    if header :matches "Subject" "*" {
-        set "subject" "${1}"; #set biến subject = subject vừa lấy
-    }
-
-    # :matches is used to get the address from the From header
-    if address :matches :all "from" "*" {
-        set "from_addr" "${1}";
-    }
-
-    notify :message "${from_addr}${env_from}: ${subject}"
-                    "mailto:test1@anthanh264.site";
-}
+```
+vim /etc/dovecot/sieve/before.sieve
 ```
 #### 1. Set mail quan trọng nhất
 - Gửi từ hadt@bizflycloud.vn tới domain dinhha.online=> set thông báo quan trọng nhất, auto fw quan trọng sang ha@dinhha.online
@@ -105,7 +62,7 @@ require ["enotify","imap4flags", "fileinto","mailbox", "variables"];
 # stop;
 #}
 ```
-#### 2. Set thứ tự quan trọng
+#### 2. Set thứ tự quan trọng (thứ 3)
 - Gửi tới ah@dinhha.online => ah@dinhha.online set flags, ha@dinhha.online nhận một message theo định dạng
 ```
 require ["enotify","imap4flags", "fileinto","mailbox", "variables"];
@@ -122,4 +79,20 @@ if header :contains "to" "ah@dinhha.online" {
  setflag ["\\Flagged"];
 }
 ```
-
+#### 3. Set từ domain
+```
+require ["enotify","envelope","imap4flags", "fileinto","mailbox", "variables"];
+if header :matches "from" "*@*bizflycloud.vn" {
+ if envelope :all :matches "from" "*" {
+  set "env_from" "[really: ${1}]";
+ }
+if header :matches "Subject" "*" {
+ set "subject" "${1}";
+}
+if address :matches :all "from" "*" {
+ set "from_addr" "${1}";
+}
+notify :message "${from_addr}${env_from}: ${subject}"
+ "mailto:ah@dinhha.online";
+}
+```
