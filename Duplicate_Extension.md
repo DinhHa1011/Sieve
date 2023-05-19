@@ -26,6 +26,15 @@
 ```
 user_query = SELECT CONCAT('/var/mail','/','%d','/','%n') as home, 'vmail' as uid, 'vmail'as gid,CONCAT('/var/mail','/','%d','/','%n') as mail FROM virtual_Users WHERE email= '%u';
 ```
+- sửa (thêm) file /etc/dovecot/conf.d/90-sieve.conf
+```
+sieve_before = /etc/dovecot/sieve/before.sieve
+
+sieve = ~/.dovecot.sieve
+
+sieve_duplicate_default_period = 15s
+sieve_duplicate_max_period = 20s
+```
 - vim /etc/dovecot/sieve/before.sieve
 ```
 require ["duplicate","fileinto","mailbox"];
