@@ -9,15 +9,15 @@
   - Đây là loại cụ thể của trạng thái result mà trình quét spam/virus tạo ra.
   - Điều này có thể là một điểm số (score), một chuỗi các ký tự giống hệt nhau (strlen), ví dụ `*******`, hoặc một văn bản miêu tả (text), ví dụ {{{Spam}}} hoặc Not Spam
 `sieve_spamtest_status_header = <header-field> [ ":" <regexp> ]`
-  - Field này chỉ định trường tiêu đề chứa thông tin kết quả của trình quét soam và nó có thể diễn đạt syntax nội dung của header. Nó không match header được tìm trong message, dòng lệnh spamtest sẽ match với '0'
+  - Field này chỉ định trường tiêu đề chứa thông tin kết quả của trình quét spam và nó có thể diễn đạt syntax nội dung của header. Nó không match header được tìm trong message, dòng lệnh spamtest sẽ match với '0'
   - Đây là một cài đặt structured. Phần đầu tiên chỉ định tên header field
-  - Tùy chọn, một biểu thức chính quy posix theo sau tên field header, cách nhau bởi dấu hai chấm ':'. Bất kì khoảng trắng nào ngay sau dấu 2 chấm không phải là một phần của biể thức chính quy. Nếu biểu thức chính quy bị bỏ qua, mọi nội dung  header sẽ được chấp nhận và giá trị header đầy đủ được sử dụng
+  - Tùy chọn, một biểu thức chính quy posix theo sau tên field header, cách nhau bởi dấu hai chấm ':'. Bất kì khoảng trắng nào ngay sau dấu 2 chấm không phải là một phần của biểu thức chính quy. Nếu biểu thức chính quy bị bỏ qua, mọi nội dung  header sẽ được chấp nhận và giá trị header đầy đủ được sử dụng
   - Khi một biểu thức chính quy được sử dụng, nó phải chỉ định một giá trị match (trong ngoặc) mang lại kết quả test spam mong muốn
   - Nếu header không match với biểu thức chính quy hoặc nó không match với giá trị nào được tìm thấy, test `spamtest` sẽ match với 0 trong quá trình thực thi Sieve script
 `sieve_spanmtest_max_value =`
 - Điều này chỉ định tĩnh giá trị tối đa mà điểm số spam có thể có
 `sieve_spamtest_max_header = <header-field> [":" <regexp> ]
-- Một vài spam scanners bao gồm giá trị điểm max trong một trong các status header của chúng ta. Sử dụng setting này, maximum này có thể được trích xúât từ chính thông báo thay vì chird dịnh số tối đa theo cách thử công bằng sử dụng cài đặt `sieve_spamtest_max_value` ở trên
+- Một vài spam scanners bao gồm giá trị điểm max trong một trong các status header của chúng ta. Sử dụng setting này, maximum này có thể được trích xúât từ chính thông báo thay vì chỉ định số tối đa theo cách thủ công bằng sử dụng cài đặt `sieve_spamtest_max_value` ở trên
 - Cú pháp này giống với cài đặt `sieve_spamtest_status_header`
 `sieve_spamtest_text_valueX =`
 - Khi cài đặt `sieve_spamtest_status_type` được cài là `text`, các cài đặt này chỉ định rằng `spamtest` sẽ khớp với giá trị `X` khi chuỗi được chỉ định bằng với văn bản (được trích xuất) từ tiêu đề trạng thái. Đối với spamtest và spamtestplus, các giá trị của x từ 0-10 được nhận dạng, trong khi đó virustest chỉ sử dụng giá trị giữa 0 và 5
