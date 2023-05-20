@@ -60,6 +60,7 @@ plugin {
 ```
 #### Example 4
 `Spam header: X-Spam-Score: status=3.2 required=5.0`
+
 `Virus header: X-Virus-Scan: Found to be clean`
 ```
 plugin {
