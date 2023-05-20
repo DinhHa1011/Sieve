@@ -13,7 +13,7 @@
  
 `sieve_include_max_nesting_depth = 10`
   - Độ sâu tối đa của tree
-### My config
+### My config (2 filter)
 - Sửa file `/etc/dovecot/conf.d/90-sieve.conf`
 ```
 sieve_global = /sieve
@@ -22,6 +22,7 @@ sieve_global = /sieve
 ```
 require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
 include :global "flag";
+include :global "fileinto";
 ```
 - sievec & restart (sau khi config file flag)
 ```
@@ -37,6 +38,12 @@ mkdir /sieve
 require [ "imap4flags","fileinto","mailbox","copy", "body", "regex"];
 if allof (header :contains "Subject" "hi")
 {setflag ["\\Flagged"];}
+```
+- Thêm file `fileinto.sieve`
+```
+require ["fileinto","mailbox"];
+if allof (header :contains "from" "dinhthiha1011@gmail.com")
+{fileinto :create "INBOX.AHa";}
 ```
 - sievec & restart
 ```
