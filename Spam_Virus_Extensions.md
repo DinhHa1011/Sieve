@@ -5,7 +5,7 @@
 - `spamtest`, `spamtestplus`, `virustest` extensions không enable theo mặc định, do đó cần enabled rõ ràng cài đặt sử dụng `sieve_extensions`
 - Cho phép setting cần config cho sử dụng `spamtest` và `spamtestplus` extensions
 - `virustest` extension có cài đặt cấu hình giống hệt nhau, nhưng với một `sieve_virustest_prefix` thay vì `sieve_spamtest_prefix`:
-`sieve_spamtest_status_type = "score" / "strlen" / "text"
+`sieve_spamtest_status_type = "score" / "strlen" / "text"`
   - Đây là loại cụ thể của trạng thái result mà trình quét spam/virus tạo ra.
   - Điều này có thể là một điểm số (score), một chuỗi các ký tự giống hệt nhau (strlen), ví dụ `*******`, hoặc một văn bản miêu tả (text), ví dụ {{{Spam}}} hoặc Not Spam
 `sieve_spamtest_status_header = <header-field> [ ":" <regexp> ]`
