@@ -13,3 +13,33 @@
  
 `sieve_include_max_nesting_depth = 10`
   - Độ sâu tối đa của tree
+### My config
+- Sửa file /etc/dovecot/conf.d/90-sieve.conf
+```
+sieve_global = /sieve
+```
+- Sửa file /etc/dovecot/sieve/before.sieve (để đọc file flag.sieve)
+```
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+include :global "flag";
+```
+- sievec & restart
+```
+sievec sieve/before.sieve
+systemctl restart dovecot
+```
+- Tạo folder `/sieve`
+```
+mkdir /sieve
+```
+- Thêm file flag.sieve
+```
+require [ "imap4flags","fileinto","mailbox","copy", "body", "regex"];
+if allof (header :contains "Subject" "hi")
+{setflag ["\\Flagged"];}
+```
+- sievec & restart
+```
+sievec sieve/flag.sieve
+systemctl restart dovecot
+```
