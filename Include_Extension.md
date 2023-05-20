@@ -23,7 +23,7 @@ sieve_global = /sieve
 require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
 include :global "flag";
 ```
-- sievec & restart
+- sievec & restart (sau khi config file flag)
 ```
 sievec sieve/before.sieve
 systemctl restart dovecot
