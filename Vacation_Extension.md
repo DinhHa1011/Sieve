@@ -1,0 +1,5 @@
+- Sieve vacation extension RFC 5230 xác định một cơ chế để tạo trả lời tự động cho các email đến
+- Cần có nhiều biện pháp phòng ngừa khác nhau để đảm bảo rằng các câu trả lời chỉ được gửi khi thích hợp
+- Tác giả script có thể chỉ định tần suất trả lời có thể được gửi đến một liên hệ cụ thể
+- Trong vacation extension nguyên bản, khoảng thời gian này được chỉ định theo ngày với tối thiểu là một ngày
+- Khi cần thiết hơn và đặc biệt là khi trả lời phải được gửi thường xuyên hơn 1 ngày, có thể sử dụng vacation-seconds extension 
