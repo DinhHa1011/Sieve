@@ -160,6 +160,16 @@ sudo systemctl start spamassassin.service
 XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X
 ```
 #### Config 
+- Thêm plugin
+`vim /etc/dovecot/config/90-sieve.master`
+```
+   sieve_extensions = +spamtest +spamtestplus
+
+  sieve_spamtest_status_type = score
+  sieve_spamtest_status_header = \
+    X-Spam-Score: [[:alnum:]]+, score=(-?[[:digit:]]+\.[[:digit:]])
+  sieve_spamtest_max_value = 5.0
+```
 - Create and config file `vim /sieve/spam.sieve`
 ```
 require ["fileinto", "spamtest"];
