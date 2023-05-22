@@ -99,3 +99,63 @@ sudo nano /etc/default/spamassassin
 OPTIONS="--create-prefs --max-children 5 --username spamd --helper-home-dir /home/spamd/ -s /home/spamd/spamd.log"
 ```
 - Find the line `CRON=0` change the value from 0 to 1 `CRON=1`
+- Backup and create new file
+```
+sudo mv /etc/spamassassin/local.cf  /etc/spamassassin/local.cf.bk
+sudo vim /etc/spamassassin/local.cf 
+```
+- Add content into file
+```
+rewrite_header Subject ***** SPAM _SCORE_ *****
+
+report_safe             0
+
+required_score          5.0
+
+use_bayes               1
+
+use_bayes_rules         1
+
+bayes_auto_learn        1
+
+skip_rbl_checks         0
+
+use_razor2              0
+
+use_dcc                 0
+
+use_pyzor               0
+
+ifplugin Mail::SpamAssassin::Plugin::Shortcircuit
+
+endif
+```
+- Edit file master postfix
+```
+sudo vim /etc/postfix/master.cf
+```
+- Locate these entries:
+`smtp      inet  n       -       y       -       -       smtpd`
+- Add this line below this `-o content_filter=spamassassin`
+![](https://hackmd.io/_uploads/BJo_xwuBh.png)
+This line is indented by one space compared to the smtp line, o parameter is displayed in blue
+- And also add at the end of the file
+```
+spamassassin unix -     n       n       -       -       pipe
+
+user=spamd argv=/usr/bin/spamc -f -e  
+
+/usr/sbin/sendmail -oi -f ${sender} ${recipient}
+```
+![](https://hackmd.io/_uploads/HkMpgwOHh.png)
+- Restart postfix and enable Spamassassin
+```
+sudo systemctl restart postfix.service
+postfix reload
+sudo systemctl enable spamassassin.service
+sudo systemctl start spamassassin.service
+```
+- Test Spamassassin: Send email with content
+```
+XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X
+```
