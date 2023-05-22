@@ -78,3 +78,24 @@ plugin {
   sieve_virustest_text_value5 = infected
 }
 ```
+### My Config
+#### Spamassassin
+- Install 
+```
+sudo apt-get update
+sudo apt-get install spamassassin spamc -y
+```
+- Add a SpamAssassin user and disable the login
+```
+sudo adduser spamd --disabled-login
+```
+- Edit file config 
+```
+sudo nano /etc/default/spamassassin
+```
+- Add line ENABLED=0
+- Find the line: `OPTIONS="--create-prefs .....` Change it to
+```
+OPTIONS="--create-prefs --max-children 5 --username spamd --helper-home-dir /home/spamd/ -s /home/spamd/spamd.log"
+```
+- Find the line `CRON=0` change the value from 0 to 1 `CRON=1`
