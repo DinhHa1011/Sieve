@@ -159,3 +159,26 @@ sudo systemctl start spamassassin.service
 ```
 XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X
 ```
+#### Config 
+- Create and config file `vim /sieve/spam.sieve`
+```
+require ["fileinto", "spamtest"];
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+require ["relational", "comparator-i;ascii-numeric"];
+if allof (
+spamtest :value "le" :comparator "i;ascii-numeric" "2"
+ #if x-spam-core <2 => mailbox SPAM (Just for test) 
+ ) {
+ fileinto :create "INBOX.Spam";
+ }
+ #
+```
+- `vim /etc/dovecot/sieve/before.sieve`
+```
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+include :global "spam";
+```
+```
+sievec /sieve/spam.sieve
+systemctl restart dovecot
+```
