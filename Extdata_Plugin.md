@@ -73,4 +73,103 @@ map {
 ```
 sieve_extdata_dict_uri = proxy::sieve
 ```
-  
+### My Config
+`vim /etc/dovecot/conf.d/90-sieve.conf`
+```
+plugin {
+
+  sieve = file:%h/sieve;active=%h/.dovecot.sieve
+  sieve_global = /sieve
+  sieve_before = /etc/dovecot/sieve/before.sieve
+  sieve_extensions = +notify +imapflags +editheader
+  sieve_extensions = +vacation-seconds
+  sieve_vacation_min_period = 0
+  sieve_vacation_default_period = 1d
+  sieve_vacation_max_period = 2d
+  sieve_trace_debug = yes
+  sieve_plugins = sieve_extdata
+  sieve_pipe_bin_dir = /etc/dovecot/conf.d/custom-pipe
+  sieve_extensions = +vnd.dovecot.extdata
+  sieve_extdata_dict_uri = proxy::sieve
+  sieve_extdata_dict_uri = file:/etc/dovecot/pigeonhole-sieve.dict
+}
+```
+- Git clone
+```
+git clone -b core-0.5 https://github.com/stephanbosch/sieve-extdata-plugin.git
+```
+```
+apt install autoconf libtool dovecot-dev automake
+cd sieve-extdata-plugin/
+./autogen.sh
+./configure --with-dovecot=/usr/lib/dovecot --with-pigeonhole=/usr/include/dovecot/sieve
+make
+make install
+ln -s /usr/local/lib/dovecot/sieve/lib90_sieve_extdata_plugin.so /usr/lib/dovecot/modules/sieve/lib90_sieve_extdata_plugin.so
+```
+`vim /etc/dovecot/dovecot.conf`
+```
+sieve_before2 = /var/vmail/sieve/notify.sieve
+
+sieve_plugins = sieve_extdata
+sieve_extensions = +vnd.dovecot.extdata
+sieve_extdata_dict_uri = proxy::sieve
+
+sieve = pgsql:/etc/dovecot/sieve-notify.conf
+```
+`vim /etc/dovecot/sieve-notify.conf`
+```
+connect = host=127.0.0.1 port=5432 dbname=vmail user=vmail password=пароль
+map {
+    pattern = priv/notify_email
+    table = mailbox
+    username_field = username
+    value_field = notify_email
+}
+```
+`vim /etc/dovecot/sieve-extdata-lookup.dict`
+```
+priv/vacation_message
+Sorry I am out of the office
+```
+`vim /etc/dovecot.conf`
+```
+dict {
+    sieve = mysql:/etc/dovecot/pigeonhole-sieve.dict
+}
+```
+`vim /etc/dovecot/pigeonhole-sieve.dict`
+```
+connect = host=localhost dbname=dovecot user=dovecot password=password
+
+map {
+  pattern = priv/vacation_message   # The dict value to lookup
+  table = virtual_users             # The SQL table to perform the lookup in
+  username_field = email            # The username field to search on in the table
+  value_field = vacation_msg        # The database value to return
+}
+```
+`vim /sieve/extdata.sieve`
+```
+require ["fileinto","mailbox", "variables", "vnd.dovecot.extdata"];
+
+   if allof (header :is "X-Spam-Status" "Yes",
+     extdata :is "discard_spam" "yes") {
+     discard;
+   } else {
+     fileinto "INBOX.Spam";
+   }
+```
+```
+sievec /sieve/extdata.sieve
+```
+`vim /etc/dovecot/sieve/before.sieve`
+```
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+include :global "extdata";
+```
+```
+sievec /etc/dovecot/sieve/before.sieve
+systemctl restart dovecot
+```
+
