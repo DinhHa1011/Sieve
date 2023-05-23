@@ -13,6 +13,7 @@
   - Giá trị tối thiểu cho cài đặt này là 4000 byte
   - Giá trị tính bằng byte (trừ khi theo sau là k(ilo))
 ### My Config
+#### variables.sieve
 `vim /sieve/variables.sieve`
 - `set`: gán variable 
 - `${}`: gọi variable đã gán
@@ -35,4 +36,31 @@ sievec /sieve/variables.sieve
 ```
 require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
 include :global "variables";
+```
+#### variables2.sieve
+- `vim /etc/dovecot/conf.d/90-sieve.conf`
+```
+plugin {
+
+  sieve = file:%h/sieve;active=%h/.dovecot.sieve
+  sieve_global = /sieve
+  sieve_before = /etc/dovecot/sieve/before.sieve
+  sieve_extensions = +notify +imapflags +editheader
+
+  sieve_trace_debug = yes
+
+}
+```
+
+- `vim /sieve/variables2.sieve`
+```
+require ["editheader","variables","fileinto","mailbox"];
+#[demo] hihi = $1 $2 
+if header :matches "Subject" "[*]*"  #match header tự nhận $1 là phần trong [] $2 là phần còn lại
+{                set "demo" "${1}"; #set phần biến $1 thành $demo
+                 set :upper "b" "${demo}"; # set :inhoa <tên biến mới> <biến cũ>
+                deleteheader "Subject"; #xóa header subject
+                 addheader "Subject" "${b}"; # thêm header mới kèm biến $b
+                 fileinto :create "INBOX.Junk";} # đổ vào junk để nhìn log cho dễ
+                 # Ví dụ subject gửi là [demo] hihi  sau script sẽ thành  DEMO
 ```
