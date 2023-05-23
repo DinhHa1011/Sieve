@@ -14,6 +14,8 @@
   - Giá trị tính bằng byte (trừ khi theo sau là k(ilo))
 ### My Config
 `vim /sieve/variables.sieve`
+- `set`: gán variable 
+- `${}`: gọi variable đã gán
 ```
 require ["fileinto","variables", "mailbox", "encoded-character"];
 set "i" "ID";
