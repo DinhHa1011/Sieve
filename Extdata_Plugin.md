@@ -36,3 +36,41 @@ plugin {
   sieve_extdata_dict_uri = file:/etc/dovecot/pigeonhole-sieve.dict
 }
 ```
+### Usage
+- Sieve scripts có thể sử dụng extension mới `vnd.dovecot.extdata` dưới đây:
+```
+require ["variables", "vacation", "vnd.dovecot.extdata"];
+
+vacation :days 30 :subject "${extdata.vacation_subject}" "${extdata.vacation_message}";
+keep;
+```
+- `priv/vacation_subject` và `priv/vacation_message` sẽ được tra cứu trong dovecot dict. Xem bên dưới để biết một số ví dụ
+#### Dict with flat file backend
+- Để sử dụng flat file backend cho ví dụ trên, tạo một dict file với format dưới đây (cho ví dụ /etc/dovecot/sieve-extdata-lookup.dict):
+```
+priv/vacation_message
+Sorry I am out of the office
+```
+#### Dict với SQL backend
+- Để sử dụng SQL backend cho ví dụ trên, đầu tiên set up một dict proxy trong /etc/dovecot.conf:
+```
+dict {
+    sieve = mysql:/etc/dovecot/pigeonhole-sieve.dict
+}
+```
+- Và trong /etc/dovecot/pigeonhole-sieve.dict:
+```
+connect = host=localhost dbname=dovecot user=dovecot password=password
+
+map {
+  pattern = priv/vacation_message   # The dict value to lookup
+  table = virtual_users             # The SQL table to perform the lookup in
+  username_field = email            # The username field to search on in the table
+  value_field = vacation_msg        # The database value to return
+}
+```
+- Cuối cùng config extdata để sử dụng proxy:
+```
+sieve_extdata_dict_uri = proxy::sieve
+```
+  
