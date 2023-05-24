@@ -41,4 +41,152 @@ sieve_plugin = sieve_extpreograms
   - Điều này phù hợp với format tin nhắn Internet Message (RFC 5322) và bản thân Sieve sử dụng làm kết thúc dòng. Đặt cái này thành "lf" để sử dụng một ký tự LF thay thế
   
 #### Configuration Example 1: socket service cho "pipe" và "execute"
+```
+plugin {
+  sieve = ~/.dovecot.sieve
 
+  sieve_plugins = sieve_extprograms
+  sieve_global_extensions = +vnd.dovecot.pipe +vnd.dovecot.execute
+
+  # pipe sockets in /var/run/dovecot/sieve-pipe
+  sieve_pipe_socket_dir = sieve-pipe
+
+  # execute sockets in /var/run/dovecot/sieve-execute
+  sieve_execute_socket_dir = sieve-execute
+}
+
+service sieve-pipe-script {
+  # This script is executed for each service connection
+  executable = script /usr/lib/dovecot/sieve-extprograms/sieve-pipe-action.sh
+
+  # use some unprivileged user for execution
+  user = dovenull
+
+  # socket name is program-name in Sieve (without sieve-pipe/ prefix)
+  unix_listener sieve-pipe/sieve-pipe-script {
+  }
+}
+
+service sieve-execute-action {
+  # This script is executed for each service connection
+  executable = script /usr/lib/dovecot/sieve-extprograms/sieve-execute-action.sh
+
+  # use some unprivileged user for execution
+  user = dovenull
+
+  # socket name is program-name in Sieve (without sieve-execute/ prefix)
+  unix_listener sieve-execute/sieve-execute-action {
+  }
+}
+```
+#### Configuration Example 2: direct execution for "pipe" và "filter"
+```
+plugin {
+  sieve = ~/.dovecot.sieve
+
+  sieve_plugins = sieve_extprograms
+  sieve_global_extensions = +vnd.dovecot.pipe +vnd.dovecot.filter
+
+  # This directory contains the scripts that are available for the pipe command.
+  sieve_pipe_bin_dir = /usr/lib/dovecot/sieve-pipe
+
+  # This directory contains the scripts that are available for the filter
+  # command.
+  sieve_filter_bin_dir = /usr/lib/dovecot/sieve-filter
+}
+```
+### Usage
+### Full Examples
+#### Example 1
+  - Ví dụ đơn giản này cho thấy cách sử dụng "vnd.dovecot.execute" extension để thực hiện một số loại kiểm tra đối với message đến
+  - Relevant configuration:
+  ```
+  plugin {
+    sieve_extensions = +vnd.dovecot.execute
+
+    sieve_plugins = sieve_extprograms
+    sieve_execute_bin_dir = /usr/lib/dovecot/sieve-execute
+  }
+  ```
+  - The sieve script:
+  ```
+  require "vnd.dovecot.execute";
+  if not execute :pipe "hasfrop.sh" {
+    discard;
+    stop;
+  }
+  ```
+  - Tại vị trí `usr/lib/dovecot/sieve-execute`, tạo một executable script `hasfrop.sh`
+  - Trong ví dụ này, hasfrop.sh kiểm tra liệu message có chứa văn bản chữ "FROP" ở bất kỳ đâu trong message hay không. 
+  - Sieve script hiển thị ở trên sẽ loại bỏ thông báo nếu script này kết thúc bằng mã exit khác 0, điều này xảy ra khi tìm thấy "FROP"
+  ```
+  # Something that reads the whole message and inspects it for some
+  # property. Not that the whole message needs to be read from input!
+  N=`cat | grep -i "FROP"` # Check it for the undesirable text "FROP"
+  if [ ! -z "$N" ]; then
+         # Result: deny
+         exit 1;
+  fi
+
+  # Result: accept
+  exit 0
+  ```
+  #### Example 2
+  - Ví dụ này cho thấy cách sử dụng `vnd.dovecot.execute` extension cho querying/updating một MySQL database
+  - Điều này được sử dụng để chuyển hướng message cứ sau 300s cho một người gửi cụ thể. 
+  - Chú ý rằng trường hợp sử dụng cụ thể này cũng có thể được triển khai bằng cách sử dụng "duplicate" extension
+  - Relavant configuration:
+  ```
+  plugin {
+    sieve_extensions = +vnd.dovecot.execute
+
+    sieve_plugins = sieve_extprograms
+    sieve_execute_bin_dir = /usr/lib/dovecot/sieve-execute
+  }
+  ```
+  - The sieve script: 
+  ```
+  require ["variables", "copy", "envelope", "vnd.dovecot.execute"];
+
+  # put the envelope-from address in a variable
+  if envelope :matches "from" "*" { set "from" "${1}"; }
+
+  # execute the vacationcheck.sh program and redirect the message based on its exit code
+  if execute :output "vacation_message" "vacationcheck.sh" ["${from}","300"]
+  {
+  redirect
+        :copy "foo@bar.net";
+  }
+  ```
+  - Tại vị trí `/usr/lib/dovecot/sieve-execute`, tạo script executable `vacationcheck.sh`
+  - Trong ví dụ này, script `vacationcheck.sh` cần 2 thông số: địa chỉ người gửi và khoảng thời gian được chỉ định tính bằng giây (s). Khoảng thời gian được sử dụng để chỉ định khoảng thời gian tối thiểu cần phải trôi qua kể từ khi người gửi được nhìn thấy lần cuối
+  - Nếu script trả về mã exit 0, sau đó message được chuyển hướng trong Sieve script được hiển thị
+  ```
+  USER=postfixadmin
+  PASS=pass
+  DATABASE=postfixadmin
+
+  # DB STRUCTURE
+  #CREATE TABLE `sieve_count` (
+  #  `from_address` varchar(254) NOT NULL,
+  #  `date` datetime NOT NULL
+  #) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  #
+  #ALTER TABLE `sieve_count`
+  # ADD KEY `from_address` (`from_address`);
+
+  MAILS=$(mysql -u$USER -p$PASS $DATABASE --batch --silent -e "SELECT count(*) as ile FROM sieve_count WHERE from_address='$1' AND DATE_SUB(now(),INTERVAL $2 SECOND) < date;")
+  ADDRESULT=$(mysql -u$USER -p$PASS $DATABASE --batch --silent -e "INSERT INTO sieve_count (from_address, date) VALUES ('$1', NOW());")
+
+  # uncoment below to debug
+  # echo User $1 sent $MAILS in last $2 s >> /usr/lib/dovecot/sieve-pipe/output.txt
+  # echo Add result : $ADDRESULT >> /usr/lib/dovecot/sieve-pipe/output.txt
+  # echo $MAILS
+
+  if [ "$MAILS" = "0" ]
+  then
+  exit 0
+  fi
+
+  exit 1
+  ```
