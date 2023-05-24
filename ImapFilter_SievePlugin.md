@@ -1,0 +1,1 @@
+- Thông thường, Sieve filter có thể được áp dụng khi gửi mail ban đầu hoặc được kích hoạt bở các sự kiện nhất định trong giao thức IMAP (IMAP
