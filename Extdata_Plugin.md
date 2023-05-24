@@ -109,13 +109,21 @@ ln -s /usr/local/lib/dovecot/sieve/lib90_sieve_extdata_plugin.so /usr/lib/doveco
 ```
 `vim /etc/dovecot/dovecot.conf`
 ```
-sieve_before2 = /var/vmail/sieve/notify.sieve
+!include_try /usr/share/dovecot/protocols.d/*.protocol
+protocols = imap pop3 lmtp
+listen = *, ::
+#mail_debug = no
+#auth_verbose = yes
+#auth_debug = no
+#auth_debug_passwords = no
+#auth_mechanisms = plain cram-md5
+#dict {
+  #quota = mysql:/etc/dovecot/dovecot-dict-sql.conf.ext
+  #expire = sqlite:/etc/dovecot/dovecot-dict-sql.conf.ext
+#}
 
-sieve_plugins = sieve_extdata
-sieve_extensions = +vnd.dovecot.extdata
-sieve_extdata_dict_uri = proxy::sieve
-
-sieve = pgsql:/etc/dovecot/sieve-notify.conf
+!include_try local.conf
+!include conf.d/*.conf
 ```
 `vim /etc/dovecot/sieve-notify.conf`
 ```
