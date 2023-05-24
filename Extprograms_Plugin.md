@@ -191,4 +191,15 @@ plugin {
   exit 1
   ```
 ### My Config
- 
+#### Example 1: 
+`vim /usr/lib/dovecot/sieve-execute.hasfrop.sh`
+```
+N=`cat | grep -i "FROP"` # Check it for the undesirable text "FROP"
+if [ ! -z "$N" ]; then
+               # Result: deny
+               exit 1;
+fi
+
+# Result: accept
+exit 0
+```
