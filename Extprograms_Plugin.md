@@ -29,6 +29,7 @@ sieve_plugin = sieve_extpreograms
 `sieve_extension_bin_dir=`
   
   - Trỏ đến thư mục mà plugin tìm chương trình (shell scripts) để thực thi trực tiếp và chuyển message tới
+  
 `sieve_extension_exec_timeout = 10s`
   
   - Config thời gian thực thi max sau đó chương trình bị buộc chấm dứt
