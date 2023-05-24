@@ -24,20 +24,20 @@ sieve_plugin = sieve_extpreograms
   
 `sieve_extension_socket_dir=`
   
-    - Trỏ đến một thư mục liên quan tới Dovecot base_dir nơi mà plugin tìm socket dịch vụ script
+  - Trỏ đến một thư mục liên quan tới Dovecot base_dir nơi mà plugin tìm socket dịch vụ script
   
 `sieve_extension_bin_dir=`
   
-    - Trỏ đến thư mục mà plugin tìm chương trình (shell scripts) để thực thi trực tiếp và chuyển message tới
+  - Trỏ đến thư mục mà plugin tìm chương trình (shell scripts) để thực thi trực tiếp và chuyển message tới
 `sieve_extension_exec_timeout = 10s`
   
-    - Config thời gian thực thi max sau đó chương trình bị buộc chấm dứt
+  - Config thời gian thực thi max sau đó chương trình bị buộc chấm dứt
   
 `sieve_extension_input_eol = crlf`
   
-    - Xác định chuỗi ký tự end-of-line được sử dụng cho dữ liệu được dẫn đến các chương trình bên ngoài
-    - Theo mặc định `crlf` hiện nay, đại diện cho một chuỗi các ký tự carriage return (CR) và line feed (LF)
-    - Điều này phù hợp với format tin nhắn Internet Message (RFC 5322) và bản thân Sieve sử dụng làm kết thúc dòng. Đặt cái này thành "lf" để sử dụng một ký tự LF thay thế
+  - Xác định chuỗi ký tự end-of-line được sử dụng cho dữ liệu được dẫn đến các chương trình bên ngoài
+  - Theo mặc định `crlf` hiện nay, đại diện cho một chuỗi các ký tự carriage return (CR) và line feed (LF)
+  - Điều này phù hợp với format tin nhắn Internet Message (RFC 5322) và bản thân Sieve sử dụng làm kết thúc dòng. Đặt cái này thành "lf" để sử dụng một ký tự LF thay thế
   
 #### Configuration Example 1: socket service cho "pipe" và "execute"
 
