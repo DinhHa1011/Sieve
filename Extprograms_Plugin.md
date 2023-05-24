@@ -192,6 +192,8 @@ plugin {
   ```
 ### My Config
 #### Example 1: 
+- Chạy 1 bash script đọc nội dung thư, nếu có từ FROP thì discard không thì gửi như bthg
+- Thêm bash script
 `vim /usr/lib/dovecot/sieve-execute.hasfrop.sh`
 ```
 N=`cat | grep -i "FROP"` # Check it for the undesirable text "FROP"
@@ -202,4 +204,106 @@ fi
 
 # Result: accept
 exit 0
+```
+- config file sieve include
+`vim /sieve/extprogram.sieve`
+```
+require ["variables", "copy", "envelope", "vnd.dovecot.execute"];
+
+# put the envelope-from address in a variable
+ if envelope :matches "from" "*" { set "from" "${1}"; }
+#
+# # execute the vacationcheck.sh program and redirect the message based on its exit code
+ if execute :output "vacation_message" "vacationcheck.sh" ["${from}","50"]
+ {
+ redirect
+       :copy "hadt@bizflycloud.vn";
+       }
+```
+`vim /etc/dovecot/sieve/before.sieve`
+```
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+include :global "extprogram";
+```
+```
+sievec /sieve/extprogram.sieve
+sievec /etc/dovecot/sieve/before.sieve
+systemctl restart dovecot
+```
+#### Example 2
+- 1 script fw, ghi dữ liệu vào database người gửi và thời gian. Script sẽ đọc database không cho fw mail liên tục
+- vacationcheck.sh cần database để lưu => tạp database, tạo user cho nó
+- Tạo database và user
+```
+mysql
+CREATE DATABASE postfixadmin;
+CREATE USER 'postfixadmin'@'localhost' IDENTIFIED BY 'pass';
+GRANT ALL PRIVILEGES ON postfixadmin.* TO 'postfixadmin'@'localhost';
+FLUSH PRIVILEGES;
+```
+- Tạo bảng lưu trữ data
+```
+use postfixadmin
+```
+```
+CREATE TABLE `sieve_count` (
+ `from_address` varchar(254) NOT NULL,
+ `date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    
+ALTER TABLE `sieve_count`
+  ADD KEY `from_address` (`from_address`);
+```
+- Check: 
+```
+mysql -u postfixadmin – p
+```
+Nhập "pass" và login
+`vim /usr/lib/dovecot/sieve-execute/vacationcheck.sh`
+```
+USER=postfixadmin
+PASS=pass
+DATABASE=postfixadmin
+
+# DB STRUCTURE
+#CREATE TABLE `sieve_count` (
+#  `from_address` varchar(254) NOT NULL,
+#  `date` datetime NOT NULL
+#) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+#
+#ALTER TABLE `sieve_count`
+# ADD KEY `from_address` (`from_address`);
+
+MAILS=$(mysql -u$USER -p$PASS $DATABASE --batch --silent -e "SELECT count(*) as ile FROM sieve_count WHERE from_address='$1' AND DATE_SUB(now(),INTERVAL $2 SECOND) < date;")
+ADDRESULT=$(mysql -u$USER -p$PASS $DATABASE --batch --silent -e "INSERT INTO sieve_count (from_address, date) VALUES ('$1', NOW());")
+
+# uncoment below to debug
+# echo User $1 sent $MAILS in last $2 s >> /usr/lib/dovecot/sieve-pipe/output.txt
+# echo Add result : $ADDRESULT >> /usr/lib/dovecot/sieve-pipe/output.txt
+# echo $MAILS
+
+if [ "$MAILS" = "0" ]
+then
+exit 0
+fi
+
+exit 1
+```
+`vim /sieve/extpr.sieve`
+```
+require "vnd.dovecot.execute";
+if not execute :pipe "hasfrop.sh" {
+  discard;
+  stop;
+}
+```
+`vim /etc/dovecot/sieve/before.sieve`
+```
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+include :global "extpr";
+```
+```
+sievec /sieve/extprogram.sieve
+sievec /etc/dovecot/sieve/before.sieve
+systemctl restart dovecot
 ```
