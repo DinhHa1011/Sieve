@@ -161,7 +161,7 @@ XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X
 ```
 #### Config 
 - Thêm plugin
-`vim /etc/dovecot/config/90-sieve.master`
+`vim /etc/dovecot/conf.d/90-sieve.conf`
 ```
    sieve_extensions = +spamtest +spamtestplus
 
