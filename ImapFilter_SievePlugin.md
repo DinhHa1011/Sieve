@@ -31,7 +31,7 @@ protocol imap {
 - Plugin này có sẵn cho Pigeonhole v0.4.14 trở lên (có sẵn cho Dovecot v2.2.24) các plugin được bao gồm trong gói Pieonhole và do đó được biên dịch và cài đặt ngầm với chính Pieonhole
 ### My Config
 - Ví dụ dưới đây config khi nào người dùng move một message vào folder report_spam, một copy của message được đặt vào folder report_ham hoặc report_spam của spam@example.com maibox tương ứng
-- Khi một message located trong folder `report_spam reply hoặc forward, một bản copy của message được đặt vào folder `report_spam_reply`
+- Khi một message located trong folder `report_spam` reply hoặc forward, một bản copy của message được đặt vào folder `report_spam_reply`
 
 `vim /etc/dovecot/dovecot.conf`
 ```
