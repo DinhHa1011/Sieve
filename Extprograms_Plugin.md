@@ -206,19 +206,13 @@ fi
 exit 0
 ```
 - config file sieve include
-`vim /sieve/extprogram.sieve`
+`vim /sieve/extpr.sieve`
 ```
-require ["variables", "copy", "envelope", "vnd.dovecot.execute"];
-
-# put the envelope-from address in a variable
- if envelope :matches "from" "*" { set "from" "${1}"; }
-#
-# # execute the vacationcheck.sh program and redirect the message based on its exit code
- if execute :output "vacation_message" "vacationcheck.sh" ["${from}","50"]
- {
- redirect
-       :copy "hadt@bizflycloud.vn";
-       }
+require "vnd.dovecot.execute";
+if not execute :pipe "hasfrop.sh" {
+  discard;
+  stop;
+}
 ```
 `vim /etc/dovecot/sieve/before.sieve`
 ```
@@ -232,7 +226,7 @@ systemctl restart dovecot
 ```
 #### Example 2
 - 1 script fw, ghi dữ liệu vào database người gửi và thời gian. Script sẽ đọc database không cho fw mail liên tục
-- vacationcheck.sh cần database để lưu => tạp database, tạo user cho nó
+- vacationcheck.sh cần database để lưu => tạo database, tạo user cho nó
 - Tạo database và user
 ```
 mysql
@@ -289,13 +283,19 @@ fi
 
 exit 1
 ```
-`vim /sieve/extpr.sieve`
+`vim /sieve/extprogram.sieve`
 ```
-require "vnd.dovecot.execute";
-if not execute :pipe "hasfrop.sh" {
-  discard;
-  stop;
-}
+require ["variables", "copy", "envelope", "vnd.dovecot.execute"];
+
+# put the envelope-from address in a variable
+ if envelope :matches "from" "*" { set "from" "${1}"; }
+#
+# # execute the vacationcheck.sh program and redirect the message based on its exit code
+ if execute :output "vacation_message" "vacationcheck.sh" ["${from}","50"]
+ {
+ redirect
+       :copy "hadt@bizflycloud.vn";
+       }
 ```
 `vim /etc/dovecot/sieve/before.sieve`
 ```
