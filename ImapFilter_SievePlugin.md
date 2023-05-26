@@ -32,6 +32,7 @@ protocol imap {
 ### My Config
 - Ví dụ dưới đây config khi nào người dùng move một message vào folder report_spam, một copy của message được đặt vào folder report_ham hoặc report_spam của spam@example.com maibox tương ứng
 - Khi một message located trong folder `report_spam reply hoặc forward, một bản copy của message được đặt vào folder `report_spam_reply`
+
 `vim /etc/dovecot/dovecot.conf`
 ```
 # Store METADATA information within user's HOME directory
@@ -70,7 +71,7 @@ mkdir -p /var/vmail/imapsieve_copy
 chown vmail:vmail /var/vmail/imapsieve_copy
 chmod 0700 /var/vmail/imapsieve_copy
 ```
-`vim /var/vmail/sieve/report_ham.sieve`
+`vim /var/vmail/sieve/report_spam.sieve`
 ```
 require ["vnd.dovecot.pipe", "copy", "imapsieve", "environment", "imap4flags"];
 
@@ -86,6 +87,20 @@ elsif anyof (allof (hasflag "\\Answered",
     pipe :copy "dovecot-lda" [ "-d", "ah@dinhha.online", "-m", "report_spam_reply" ];
 }
 
+```
+`vim /var/vmail/sieve/report_ham.sieve`
+```
+require ["vnd.dovecot.pipe", "copy", "imapsieve", "environment", "variables"];
+
+if environment :matches "imap.mailbox" "*" {
+  set "mailbox" "${1}";
+}
+
+if string "${mailbox}" [ "Trash", "train_ham", "train_prob", "train_spam" ] {
+  stop;
+}
+
+pipe :copy "dovecot-lda" [ "-d", "ah@dinhha.online", "-m", "report_ham" ];
 ```
 `vim /etc/dovecot/sieve/pipe/imapsieve_copy`
 ```
