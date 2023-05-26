@@ -15,4 +15,4 @@
   - The Sieve script có thể tạo ra bởi 1 GUI-based rules editor hoặc chúng có thể được nhập trực tiếp từ text editor
   - The script được chuyển đến mail server theo cách server-dependent
   - ManageSieve protocol cho phép người dùng quản lý Sieve scripts của họp trên một remote server
-  - Mail servers với local users có thể cho phép scripts lưu trữ trong  e.g. a .sieve file trong users' home directories
+  - Mail servers với local users có thể cho phép scripts lưu trữ trong  e.g. a .sieve file trong users' home directories.
