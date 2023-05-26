@@ -72,21 +72,20 @@ chmod 0700 /var/vmail/imapsieve_copy
 ```
 `vim /var/vmail/sieve/report_ham.sieve`
 ```
-require ["vnd.dovecot.pipe", "copy", "imapsieve", "environment", "variables"];
+require ["vnd.dovecot.pipe", "copy", "imapsieve", "environment", "imap4flags"];
 
-if environment :matches "imap.mailbox" "*" {
-    set "mailbox" "${1}";
+if environment :is "imap.cause" "COPY" {
+    pipe :copy "dovecot-lda" [ "-d", "ah@dinhha.online", "-m", "report_spam" ];
 }
 
-if string "${mailbox}" "Trash" {
-    stop;
+# Catch replied or forwarded spam
+elsif anyof (allof (hasflag "\\Answered",
+                    environment :contains "imap.changedflags" "\\Answered"),
+             allof (hasflag "$Forwarded",
+                    environment :contains "imap.changedflags" "$Forwarded")) {
+    pipe :copy "dovecot-lda" [ "-d", "ah@dinhha.online", "-m", "report_spam_reply" ];
 }
 
-if environment :matches "imap.user" "*" {
-    set "username" "${1}";
-}
-
-pipe :copy "imapsieve_copy" [ "${username}", "ham" ];
 ```
 `vim /etc/dovecot/sieve/pipe/imapsieve_copy`
 ```
