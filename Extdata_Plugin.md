@@ -152,7 +152,7 @@ map {
 `vim /sieve/extdata.sieve`
 ```
 require ["variables", "vacation", "vnd.dovecot.extdata"];
-vacation :days 30 :subject "${extdata.vacation_subject}" "${extdata.vacation_message}";
+vacation :days 30 :subject "${extdata.vacation_subject}" "${extdata.vacation_message}"; #call biến
 keep;
 ```
 ```
