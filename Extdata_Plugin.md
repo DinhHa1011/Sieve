@@ -146,8 +146,8 @@ map {
   username_field = email            # The username field to search on in the table
   value_field = vacation_msg        # The database value to return
 }
-- Truy vấn từ bảng virtual_users tại cột email tương ứng lấy giá trị vacation_msg 
-- dòng pattern = priv/vacation_message là tên biến gọi ở trên . Tác dụng của nó là gán giá trị vacation_msg  mới truy vấn được vào
+# Truy vấn từ bảng virtual_users tại cột email tương ứng lấy giá trị vacation_msg 
+# dòng pattern = priv/vacation_message là tên biến gọi ở trên . Tác dụng của nó là gán giá trị vacation_msg  mới truy vấn được vào
 ```
 `vim /sieve/extdata.sieve`
 ```
