@@ -6,7 +6,7 @@ require ["duplicate","fileinto","mailbox"];
 if allof (duplicate :header "Subject")
 {fileinto :create "INBOX.AHa";}
 ```
-![](https://hackmd.io/_uploads/Bky19XwUh.png)
+![](https://hackmd.io/_uploads/HJ_w5QPU2.png)
 ## Editheader ERROR  
 - Edit filter set báo lỗi
 ![](https://hackmd.io/_uploads/H1jH9ZPIh.png)
