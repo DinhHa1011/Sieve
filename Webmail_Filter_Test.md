@@ -1,13 +1,12 @@
 # Sieve Rouncube
 
-## Duplicate ERROR 
-- Edit filter set báo lỗi
+## Duplicate OK
 ```
 require ["duplicate","fileinto","mailbox"];
 if allof (duplicate :header "Subject")
 {fileinto :create "INBOX.AHa";}
 ```
-![](https://hackmd.io/_uploads/Byprw-PUh.png) 
+![](https://hackmd.io/_uploads/Bky19XwUh.png)
 ## Editheader ERROR  
 - Edit filter set báo lỗi
 ![](https://hackmd.io/_uploads/H1jH9ZPIh.png)
