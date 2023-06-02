@@ -125,16 +125,6 @@ listen = *, ::
 !include_try local.conf
 !include conf.d/*.conf
 ```
-`vim /etc/dovecot/sieve-notify.conf`
-```
-connect = host=127.0.0.1 port=5432 dbname=vmail user=vmail password=пароль
-map {
-    pattern = priv/notify_email
-    table = mailbox
-    username_field = username
-    value_field = notify_email
-}
-```
 `vim /etc/dovecot/sieve-extdata-lookup.dict`
 ```
 priv/vacation_message
@@ -151,22 +141,19 @@ dict {
 connect = host=localhost dbname=dovecot user=dovecot password=password
 
 map {
-  pattern = priv/vacation_message   # The dict value to lookup
+  pattern = priv/vacation_message   # The dict value to lookup 
   table = virtual_users             # The SQL table to perform the lookup in
   username_field = email            # The username field to search on in the table
   value_field = vacation_msg        # The database value to return
 }
+- Truy vấn từ bảng virtual_users tại cột email tương ứng lấy giá trị vacation_msg 
+- dòng pattern = priv/vacation_message là tên biến gọi ở trên . Tác dụng của nó là gán giá trị vacation_msg  mới truy vấn được vào
 ```
 `vim /sieve/extdata.sieve`
 ```
-require ["fileinto","mailbox", "variables", "vnd.dovecot.extdata"];
-
-   if allof (header :is "X-Spam-Status" "Yes",
-     extdata :is "discard_spam" "yes") {
-     discard;
-   } else {
-     fileinto "INBOX.Spam";
-   }
+require ["variables", "vacation", "vnd.dovecot.extdata"];
+vacation :days 30 :subject "${extdata.vacation_subject}" "${extdata.vacation_message}";
+keep;
 ```
 ```
 sievec /sieve/extdata.sieve
