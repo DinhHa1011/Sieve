@@ -34,3 +34,28 @@
     sieve_editheader_forbid_delete = X-Verified X-Seen
   }
   ```
+### My Config
+#### editheader.sieve 
+`vim /sieve/editheader.sieve`
+```
+require ["editheader","variables","fileinto","mailbox"];
+if header :matches "Subject" "[*]*"  #match header tự nhận $1 là phần trong [] $2 là phần còn lại
+{                set "demo" "${1}"; #set phần biến $1 thành $demo
+                 set :upper "b" "${demo}"; # set :inhoa <tên biến mới> <biến cũ>
+                 deleteheader "Subject"; #Test Delete Header 
+                 addheader "Subject" "${b}"; #Test Add Header
+                 fileinto :create "INBOX.sj";
+} 
+
+```
+```
+sievec /sieve/editheader.sieve
+````
+`vim /etc/dovecot/sieve/before.sieve`
+```
+require ["enotify", "fileinto", "variables", "mailbox", "envelope", "copy", "body", "regex", "imap4flags","duplicate","include"];
+include :global "editheader";
+```
+```
+sievec /etc/dovecot/sieve/before.sieve
+````
