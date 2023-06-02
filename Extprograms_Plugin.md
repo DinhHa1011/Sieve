@@ -6,7 +6,7 @@
 ### Configuration
 - Plugin được hoạt động bằng cách thêm nó vào setting `sieve_plugins`
 ```
-sieve_plugin = sieve_extpreograms
+sieve_plugin = sieve_extprograms
 ```
 - Plugin này đăng ký `vnd.dovecot.pipe`, `vnd.dovecot.filter` và `vnd.dovecot.execute` extension với thông dịch viên Sieve. 
 - Tuy nhiên, extension đó thì không enabled theo mặc định và do đó cần enabled rõ ràng. Nó thì được recommend để hạn chế việc sử dụng các extension này trong ngữ cảnh global bằng cách thêm chúng vào cài đặt `sieve_global_extensions`
