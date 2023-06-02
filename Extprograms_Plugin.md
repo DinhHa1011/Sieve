@@ -255,7 +255,7 @@ mysql -u postfixadmin – p
 ```
 Nhập "pass" và login
 `vim /usr/lib/dovecot/sieve-execute/vacationcheck.sh`
-- Sript này login vào mysql và thực thi lệnh select giá trị từ database postfixadmin. Đếm giá trị mail trong khoảng thời gian bé hơn 300s, nếu giá trị trả về là 0 thì gửi mail và ngược lại
+- Sript này login vào mysql và thực thi lệnh select giá trị từ database postfixadmin. Đếm giá trị mail trong khoảng thời gian bé hơn 50s, nếu giá trị trả về là 0 thì gửi mail và ngược lại
 ```
 USER=postfixadmin
 PASS=pass
