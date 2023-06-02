@@ -194,7 +194,7 @@ plugin {
 #### Example 1: 
 - Chạy 1 bash script đọc nội dung thư, nếu có từ FROP thì discard không thì gửi như bthg
 - Thêm bash script
-`vim /usr/lib/dovecot/sieve-execute.hasfrop.sh`
+`vim /usr/lib/dovecot/sieve-execute/hasfrop.sh`
 ```
 N=`cat | grep -i "FROP"` # Check it for the undesirable text "FROP"
 if [ ! -z "$N" ]; then
