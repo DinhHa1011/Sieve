@@ -159,6 +159,7 @@ plugin {
   }
   ```
   - Tại vị trí `/usr/lib/dovecot/sieve-execute`, tạo script executable `vacationcheck.sh`
+  - Sript này login vào mysql và thực thi lệnh select giá trị từ database postfixadmin. Đếm giá trị mail trong khoảng thời gian bé hơn 300s, nếu giá trị trả về là 0 thì gửi mail và ngược lại
   - Trong ví dụ này, script `vacationcheck.sh` cần 2 thông số: địa chỉ người gửi và khoảng thời gian được chỉ định tính bằng giây (s). Khoảng thời gian được sử dụng để chỉ định khoảng thời gian tối thiểu cần phải trôi qua kể từ khi người gửi được nhìn thấy lần cuối
   - Nếu script trả về mã exit 0, sau đó message được chuyển hướng trong Sieve script được hiển thị
   ```
